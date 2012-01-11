@@ -1,0 +1,40 @@
+<project name="junit" default="junit" xmlns:ivy="antlib:org.apache.ivy.ant">
+  <description>
+    Runs junit on system, using tests in classes whose names start with Test*.
+    Invocation: ant -f junit.build.xml
+  </description>
+
+  <import file="build.xml"/>
+  <property name="junit.build.dir" location="${build.dir}/junit" />
+  <property name="junit.haltonfailure" value="false"/>
+
+  <target name="junit" depends="junit.tool, junit.report" description="Runs JUnit, JunitReport"/>
+
+  <target name="junit.tool" depends="compile" description="Run JUnit tests.">
+    <mkdir dir="${junit.build.dir}" />
+    <!-- Run the tests, which are all classes whose name starts with 'Test'. -->
+    <junit maxmemory="512M" printsummary="withOutAndErr" haltonfailure="${junit.haltonfailure}" fork="yes">
+      <classpath>
+        <pathelement location="${build.dir}/classes" />
+        <path refid="compile.classpath"/>
+      </classpath>
+      <formatter type="xml" />
+      <batchtest todir="${junit.build.dir}">
+        <fileset dir="${src.dir}" includes="**/Test*.java"/>
+      </batchtest>
+    </junit>
+  </target>
+
+  <target name="junit.report" description="Generates an HTML report for JUnit.">
+    <taskdef name="junitreport" 
+      classname="org.apache.tools.ant.taskdefs.optional.junit.XMLResultAggregator" />
+    <junitreport todir="${junit.build.dir}">
+      <fileset dir="${junit.build.dir}" includes="TEST-*.xml"/>
+      <report format="frames" todir="${junit.build.dir}" />
+    </junitreport>
+  </target>
+  
+</project>
+
+
+

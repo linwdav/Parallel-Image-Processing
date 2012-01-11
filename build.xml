@@ -1,0 +1,64 @@
+<project name="build" default="compile" xmlns:ivy="antlib:org.apache.ivy.ant">
+  <description>
+  The basic build file for this system.
+  </description>
+
+  <import file="common.build.xml" />
+
+  <!-- Library versions -->
+  <property name="junit.version" value="4.5" />
+  
+  <target name="install-libraries" description="Install libraries needed for compilation">
+    <ivy:retrieve organisation="org.junit" module="junit" revision="${junit.version}" pattern="${lib.dir}/junit/[artifact].[ext]" sync="true" inline="true" conf="default" log="download-only" transitive="false" type="jar" />
+    <path id="junit.path" location="${lib.dir}/junit/junit.jar" />    
+  </target>
+
+  <!-- Basic properties for this system. -->
+  <property name="system.name" value="ICS612" />
+  <property name="system.main.class" value="" />
+  <property name="majorVersionNumber" value="1" />
+  <property name="minorVersionNumber" value="0" />
+  <tstamp>
+    <format property="DAYSTAMP" pattern="Mdd" />
+    <format property="TSTAMP" pattern="HH:mm:ss" />
+  </tstamp>
+  <property name="version" value="${majorVersionNumber}.${minorVersionNumber}.${DAYSTAMP}" />
+
+  <!-- The compile classpath is useful to many tools. -->
+  <path id="compile.classpath">
+    <path refid="junit.path" />
+  </path>
+
+
+  <target name="compile" depends="install-ivy, install-libraries" description="Compiles the code and copies resource files to build.classes.dir">
+    <!-- Now compile the code into build/classes -->
+    <mkdir dir="${build.classes.dir}" />
+    <javac srcdir="${src.dir}" destdir="${build.classes.dir}" debug="on" includeAntRuntime="no">
+      <classpath refid="compile.classpath" />
+      <compilerarg value="-Xlint:all" />
+      <compilerarg value="-Werror" />
+    </javac>
+    <!-- Copy html markup and static files from webapp directory to build.classes.dir -->
+    <copy todir="${build.classes.dir}" overwrite="true">
+      <fileset dir="${src.dir}">
+        <include name="**/*.*" />
+        <exclude name="**/*.java" />
+      </fileset>
+    </copy>
+  </target>
+
+  <path id="run.classpath">
+    <path refid="compile.classpath" />
+    <pathelement path="${build.classes.dir}" />
+  </path>
+
+  <target name="run-server" depends="compile">
+    <java classpathref="run.classpath" classname="${system.server.main.class}" fork="true" />
+  </target>
+
+</project>
+
+
+
+
+

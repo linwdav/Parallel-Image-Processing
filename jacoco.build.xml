@@ -1,0 +1,63 @@
+<project name="jacoco" default="jacoco" xmlns:jacoco="antlib:org.jacoco.ant" xmlns:ivy="antlib:org.apache.ivy.ant">
+  <description>
+  Generates coverage data for JUnit tests. Cleans, compiles, instruments, runs JUnit. 
+  Invocation: ant -f jacoco.build.xml
+  </description>
+
+  <import file="build.xml" />
+  <import file="junit.build.xml" />
+  <property name="jacoco.version" value="0.5.1.20110321224001"/>
+  <property name="jacoco.install.dir" location="${lib.dir}/jacoco"/>
+  
+  <property name="jacoco.dir" location="${build.dir}/jacoco" />
+  <property name="jacoco.classes.dir" location="${build.dir}/classes" />
+  <property name="jacoco.report.dir" location="${jacoco.dir}/report" />
+  <property name="jacoco.exec.file" location="${jacoco.dir}/jacoco.exec" />
+  
+  <target name="install-jacoco" depends="install-ivy">
+    <ivy:retrieve module="jacoco" organisation="org.jacoco" revision="${jacoco.version}" pattern="${lib.dir}/jacoco/[artifact].[ext]" sync="true" inline="true" log="download-only" transitive="false" type="jar"/>
+    <taskdef uri="antlib:org.jacoco.ant" resource="org/jacoco/ant/antlib.xml">
+      <classpath path="${jacoco.install.dir}/jacocoant.jar" />
+    </taskdef>
+  </target> 
+
+  <target name="jacoco-tool" depends="clean, compile, install-jacoco">
+    <jacoco:coverage destfile="${jacoco.exec.file}">
+      <junit maxmemory="512M" printsummary="withOutAndErr" haltonfailure="${junit.haltonfailure}" fork="yes">
+         <classpath>
+           <pathelement location="${build.dir}/classes" />
+           <path refid="compile.classpath"/>
+         </classpath>
+         <batchtest todir="${junit.build.dir}">
+           <fileset dir="${src.dir}" includes="**/Test*.java"/>
+         </batchtest>
+       </junit>
+    </jacoco:coverage>
+  </target>
+
+  <target name="jacoco-report" depends="jacoco-tool">
+    <jacoco:report>
+      <!-- This task needs the collected execution data and ... -->
+      <executiondata>
+        <file file="${jacoco.exec.file}" />
+      </executiondata>
+      <!-- the class files and optional source files ... -->
+      <structure name="JaCoCo Coverage">
+        <classfiles>
+          <fileset dir="${jacoco.classes.dir}" />
+        </classfiles>
+        <sourcefiles encoding="UTF-8">
+          <fileset dir="${src.dir}" />
+        </sourcefiles>
+      </structure>
+
+      <!-- to produce reports in different formats. -->
+      <html destdir="${jacoco.report.dir}" />
+      <csv destfile="${jacoco.report.dir}/report.csv" />
+      <xml destfile="${jacoco.report.dir}/report.xml" />
+    </jacoco:report>
+  </target>
+  
+  <target name="jacoco" depends="jacoco-tool, jacoco-report" />
+    
+</project>

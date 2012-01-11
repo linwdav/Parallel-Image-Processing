@@ -1,0 +1,65 @@
+<project name="common" xmlns:ivy="antlib:org.apache.ivy.ant">
+  <description>
+  Boilerplate Ant code that is project-independent. 
+  </description>
+
+  <!-- Basic directory structure. -->
+  <property name="src.dir" location="${basedir}/src" />
+  <property name="lib.dir" location="${basedir}/lib" />
+  <property name="build.dir" location="${basedir}/build" />
+  <property name="build.classes.dir" location="${basedir}/build/classes" />
+
+  <!-- Make sure we're running a Java 6 or better. -->
+  <condition property="java.6.available">
+    <contains string="${java.version}" substring="1.6" />
+  </condition>
+  <fail message="This package requires Java 6." unless="java.6.available" />
+
+  <!-- Make sure we're running Ant 1.8.  -->
+  <condition property="ant.1.8.available">
+    <and>
+      <contains string="${ant.version}" substring="1.8" />
+    </and>
+  </condition>
+  <fail message="This package requires Ant 1.8; found ${ant.version}" unless="ant.1.8.available" />
+
+  <!-- Ivy download and configuration targets -->
+  <property name="ivy.jar.path" location="${user.home}/.ivy2/ivyjar/" />
+  <property name="ivy.version" value="2.1.0"/>
+  <available file="${ivy.jar.path}/ivy.jar" type="file" property="ivy.available" />
+
+  <target name="install-ivy" depends="download-ivy-if-necessary" description="Makes Ivy tasks available, downloads Ivy first if necessary.">
+    <taskdef resource="org/apache/ivy/ant/antlib.xml" uri="antlib:org.apache.ivy.ant" classpath="${ivy.jar.path}/ivy.jar" />
+  </target>
+
+  <target name="download-ivy-if-necessary" unless="ivy.available" description="Only downloads Ivy if necessary.">
+    <mkdir dir="${ivy.jar.path}" />
+    <get src="http://repo1.maven.org/maven2/org/apache/ivy/ivy/${ivy.version}/ivy-${ivy.version}.jar" dest="${ivy.jar.path}/ivy.jar" usetimestamp="true" />
+  </target>
+
+  <!-- Where to look for configuration files (Checkstyle, PMD, FindBugs, etc.) -->
+  <!-- These are downloaded when the associated tool is first invoked. -->
+  <property name="configfiles.url" value="http://ics-software-engineering.googlecode.com/svn/trunk/configfiles/" />
+  <property name="configfiles.dir" location="${lib.dir}/configfiles" />
+  <mkdir dir="${configfiles.dir}" />
+
+  <!-- Miscellaneous housekeeping targets -->
+  <target name="clean" description="Delete build/ directory and top-level jar files.">
+    <delete dir="${build.dir}" />
+  </target>
+
+  <target name="reallyclean" depends="clean" description="Delete build/ and bin/ directories, top-level jar files, and lib/ directory.">
+    <delete dir="${lib.dir}" />
+    <delete dir="${basedir}/bin" />
+    <delete>
+      <fileset dir="${basedir}">
+        <include name="*.jar"/>
+      </fileset>
+    </delete>
+  </target>
+
+  <target name="convertLineEndings" description="Makes line endings compatible with host platform.">
+    <fixcrlf srcdir="${basedir}" includes="*.build.xml" />
+  </target>
+
+</project>

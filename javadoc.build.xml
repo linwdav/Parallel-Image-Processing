@@ -1,0 +1,25 @@
+<project name="javadoc" default="javadoc.tool">
+  <description>
+    Provides JavaDoc. 
+  </description>
+
+  <import file="build.xml" />
+  <property name="javadoc.dir" location="${build.dir}/javadoc" />
+  <property name="javadoc.failonerror" value="false" />
+
+  <target name="javadoc.tool" depends="compile" description="Generate JavaDoc.">
+    <mkdir dir="${javadoc.dir}" />
+    <javadoc classpathref="compile.classpath"
+             sourcepath="${src.dir}"
+             destdir="${javadoc.dir}"
+             author="true"
+             version="true"
+             use="true"
+             package="true"
+             overview="${src.dir}/overview.html"
+             windowtitle="${system.name} API"
+             doctitle="${system.name} API"
+             failonerror="${javadoc.failonerror}"
+             linksource="true" />
+  </target>
+</project>

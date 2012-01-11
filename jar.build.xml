@@ -1,0 +1,44 @@
+<project name="jar" default="jar">
+	<description>
+  Provides the target for building a jar file of the example.
+  </description>
+
+	<import file="build.xml" />
+	<property name="tmp.dir" location="${basedir}/tmp" />
+	<property name="tmp.lib.dir" location="${basedir}/tmp-lib" />
+
+
+	<target name="jar" depends="compile">
+		<delete dir="${tmp.dir}" quiet="yes" />
+		<mkdir dir="${tmp.dir}" />
+
+		<!-- Copy the class files. -->
+		<copy todir="${tmp.dir}">
+			<fileset dir="${basedir}/build/classes/" />
+		</copy>
+
+		<!-- Copy over the required libraries. -->
+		<unjar dest="${tmp.dir}">
+			<fileset dir="${lib.dir}/restlet">
+				<include name="*.jar" />
+			</fileset>
+		</unjar>
+
+	  <!-- systemh-api library -->
+    <unjar dest="${tmp.dir}">
+      <fileset dir="${basedir}/systemh-api">
+        <include name="*.jar" />
+      </fileset>
+    </unjar>
+	  
+		<jar destfile="${basedir}/${system.name}.jar" basedir="${tmp.dir}">
+			<manifest>
+				<attribute name="Main-Class" value="${system.main.class}" />
+			</manifest>
+		</jar>
+		<delete dir="${tmp.dir}" />
+	</target>
+
+
+</project>
+

@@ -1,0 +1,14 @@
+<ivysettings>
+  <settings defaultResolver="chained"/>
+  <resolvers>
+    <chain name="chained">
+
+      <!-- IvyRoundup is where third party libraries are located. See build.xml -->
+      <packager name="roundup" buildRoot="${user.home}/.ivy2/packager/build" resourceCache="${user.home}/.ivy2/packager/cache">
+        <ivy pattern="http://ivyroundup.googlecode.com/svn/trunk/repo/modules/[organisation]/[module]/[revision]/ivy.xml"/>
+        <artifact pattern="http://ivyroundup.googlecode.com/svn/trunk/repo/modules/[organisation]/[module]/[revision]/packager.xml"/>
+      </packager>
+
+    </chain>
+  </resolvers>
+</ivysettings>

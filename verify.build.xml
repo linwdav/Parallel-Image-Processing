@@ -1,0 +1,23 @@
+<project name="verify" default="verify">
+  <description>
+    Runs junit, pmd, checkstyle, and findbugs, failing the build if problems found.
+    Invocation: ant -f verify.build.xml
+  </description>
+
+  <!-- First, override the default settings of these properties. -->
+  <property name="pmd.failonerror" value="true"/>
+  <property name="findbugs.failOnError" value="true"/>  
+  <property name="checkstyle.failOnViolation" value="true"/> 
+  <property name="junit.haltonfailure" value="true"/>
+
+  <!-- Now import the target definitions. -->
+  <import file="pmd.build.xml"/>
+  <import file="findbugs.build.xml"/>
+  <import file="checkstyle.build.xml"/>
+  <import file="junit.build.xml"/>
+      
+  <target name="verify" depends="clean, compile, checkstyle.tool, pmd.tool, findbugs.tool, junit.tool"
+          description="Invoke analyzers, fail if any errors found.">
+    <fail message="FindBugs reported warnings." if="findbugs.warningsfound"/>
+  </target>
+</project>  
