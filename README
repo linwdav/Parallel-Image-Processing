@@ -1,0 +1,4 @@
+Compile with "javac ConcurrentInvert.java"
+
+Run with "java ConcurrentInvert <input file> <# threads>"
+Example: "java ConcurrentInvert image.jpg 2"
